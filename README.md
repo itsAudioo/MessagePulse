@@ -17,7 +17,9 @@
   <img src="https://img.shields.io/nuget/v/SwDevtools?style=for-the-badge&logo=actigraph&logoColor=cyan&logoSize=auto&label=SwDevtools&color=cyan&link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FSwDevtools">
 </p>
 <div align="center">
-  <img src="https://img.shields.io/discord/413720437445492737?logo=discord&logoColor=cyan&style=for-the-badge&color=cyan&link=https%3A%2F%2Fdiscord.gg%2UgFNpmbqcc" height="32px" alt="Discord">
+  <a href="https://discord.gg/UgFNpmbqcc">
+    <img src="https://img.shields.io/discord/413720437445492737?logo=discord&logoColor=cyan&style=for-the-badge&color=cyan&link=https%3A%2F%2Fdiscord.gg%2UgFNpmbqcc" height="32px" alt="Discord">
+  </a>
   <a href="https://buymeacoffee.com/itsaudio">
     <img src="https://cdn.buymeacoffee.com/uploads/project_updates/2023/12/08f1cf468ace518fc8cc9e352a2e613f.png" height="29px" alt="Buy Me A Coffee"/>
   </a>
