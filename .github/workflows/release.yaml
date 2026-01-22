@@ -1,0 +1,93 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      should_build: ${{ steps.version.outputs.should_build }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get commit message
+        id: commit
+        run: |
+          MSG="$(git log -1 --pretty=%B)"
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$MSG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Extract version from commit message
+        id: version
+        run: |
+          MSG="${{ steps.commit.outputs.message }}"
+
+          if [[ "$MSG" =~ \[release\][[:space:]]*v([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "should_build=true" >> $GITHUB_OUTPUT
+          else
+            echo "No triggerbuild [release] vX.Y.Z found — skipping build."
+            echo "should_build=false" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/setup-dotnet@v4
+        if: steps.version.outputs.should_build == 'true'
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        if: steps.version.outputs.should_build == 'true'
+        run: dotnet restore Plugin.csproj
+
+      - name: Build
+        if: steps.version.outputs.should_build == 'true'
+        run: dotnet build Plugin.csproj -c Release --no-restore
+
+      - name: Publish / Build zip
+        if: steps.version.outputs.should_build == 'true'
+        run: |
+          dotnet publish Plugin.csproj \
+            -c Release \
+            /p:Version=${{ steps.version.outputs.version }}
+
+      - name: Upload build artifacts
+        if: steps.version.outputs.should_build == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-${{ steps.version.outputs.version }}
+          path: |
+            **/*.zip
+
+  release:
+    needs: build
+    if: needs.build.outputs.should_build == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-${{ needs.build.outputs.version }}
+          path: artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.build.outputs.version }}
+          name: ${{ github.event.repository.name }} v${{ needs.build.outputs.version }}
+          prerelease: false
+          files: artifacts/**/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
