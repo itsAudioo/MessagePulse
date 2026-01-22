@@ -37,7 +37,13 @@ public partial class DeadShowImage
 
         foreach (var player in deadPlayers)
         {
-            if (player.Controller.Team is Team.Spectator or Team.None)
+            if (player.IsFakeClient || !player.IsValid)
+            {
+                deadPlayers.Remove(player);
+                continue;
+            }
+
+            if (player.Pawn?.Team is Team.Spectator or Team.None)
                 continue;
 
             player.SendCenterHTML("", 1);
