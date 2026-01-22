@@ -482,3 +482,6 @@ $RECYCLE.BIN/
 *.swp
 
 .prettierrc
+build/
+bin/
+obj/
