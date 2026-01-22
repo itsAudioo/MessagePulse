@@ -63,7 +63,7 @@ public sealed class DynamicEvents
     {
         if (!Config.Enabled) return;
 
-        if (!hotReload)
+        if (hotReload)
         {
             this.rulesByEventType.Clear();
         }
