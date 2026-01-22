@@ -65,7 +65,6 @@ public sealed partial class DeadShowImage(ISwiftlyCore core, IPluginLogger logge
             try
             {
                 token.Cancel();
-                deadPlayers.Clear();
             }
             catch (ObjectDisposedException)
             {
@@ -78,5 +77,6 @@ public sealed partial class DeadShowImage(ISwiftlyCore core, IPluginLogger logge
         }
 
         timers.Clear();
+        deadPlayers.Clear();
     }
 }
