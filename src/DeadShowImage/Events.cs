@@ -37,7 +37,10 @@ public partial class DeadShowImage
 
         foreach (var player in deadPlayers)
         {
-            if (player.IsFakeClient || !player.IsValid)
+            if (player is null)
+                continue;
+
+            if (player.IsFakeClient is true || player.IsValid is false)
             {
                 deadPlayers.Remove(player);
                 continue;
@@ -50,6 +53,17 @@ public partial class DeadShowImage
             deadPlayers.Remove(player);
         }
 
+        return HookResult.Continue;
+    }
+
+    [GameEventHandler(HookMode.Pre)]
+    private HookResult OnPlayerDisconnect(EventPlayerDisconnect @event)
+    {
+        var player = @event.UserIdPlayer;
+        if (player is null || !player.IsValid)
+            return HookResult.Continue;
+
+        deadPlayers.Remove(player);
         return HookResult.Continue;
     }
 }
